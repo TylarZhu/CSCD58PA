@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "vnscommand.h": "c",
+        "sr_protocol.h": "c"
+    }
+}
