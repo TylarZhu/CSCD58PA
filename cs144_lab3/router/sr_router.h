@@ -78,4 +78,7 @@ void longest_prefix_match(struct in_addr);
 void handle_arp(struct sr_instance *, uint8_t *, unsigned int, char *);
 void handle_arp(struct sr_instance *, uint8_t *, unsigned int, char *);
 
+sr_arp_hdr_t *get_arp_header(uint8_t *);
+sr_ethernet_hdr_t *get_Ethernet_header(uint8_t *);
+
 #endif /* SR_ROUTER_H */

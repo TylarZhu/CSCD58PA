@@ -183,7 +183,3 @@ void print_hdrs(uint8_t *buf, uint32_t length) {
   }
 }
 
-sr_ip_hdr_t *get_ip_header(uint8_t *buf) {
-  return (sr_ip_hdr_t *)(buf + sizeof(sr_ethernet_hdr_t));
-}
-

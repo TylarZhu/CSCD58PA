@@ -45,6 +45,4 @@ void print_hdr_arp(uint8_t *buf);
 /* prints all headers, starting from eth */
 void print_hdrs(uint8_t *buf, uint32_t length);
 
-sr_ip_hdr_t *get_ip_header(uint8_t *buf);
-
 #endif /* -- SR_UTILS_H -- */

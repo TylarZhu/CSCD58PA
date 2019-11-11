@@ -96,10 +96,11 @@ void handle_arp(struct sr_instance *sr,
                       uint8_t *packet/* lent */,
                       unsigned int len,
                       char *interface/* lent */){
-  sr_arp_hdr_t *arp_header = (sr_arp_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t));
-  sr_ethernet_hdr_t *ethernet_header = (sr_ethernet_hdr_t *)packet;
+  sr_arp_hdr_t *arp_header = get_arp_header(packet);
+  sr_ethernet_hdr_t *ethernet_header = get_Ethernet_header(packet);
   struct sr_if *packet_interface = sr_get_interface(sr, interface);
 
+  /* if it is a arp request */
   if (arp_op_request == ntohs(arp_header->ar_op)) {
     printf("It is a arp request!\n");
 
@@ -126,8 +127,10 @@ void handle_arp(struct sr_instance *sr,
     memcpy(reply_ethernet_header->ether_shost, packet_interface->addr, ETHER_ADDR_LEN);
 
     /*reply arp */
-    memcpy(reply_arp_header, arp_reply, sizeof(sr_arp_hdr_t));
-    
+    memcpy(reply_arp_header, arp_header, sizeof(sr_arp_hdr_t));
+
+    /* need to put ethernet and arp together in arp_reply */
+
 
     sr_send_packet(sr, arp_reply, sizeof(arp_reply), interface);
 
@@ -135,20 +138,6 @@ void handle_arp(struct sr_instance *sr,
   } else {
     printf("It is a arp reply!\n");
   }
-  /*uint8_t *addr = &ehdr->ether_dhost;
-  int pos = 0, flag = 0;
-  for (; pos < ETHER_ADDR_LEN; pos++) {
-    if(addr[pos] != 255){
-      flag = 1;
-    }
-  }
-
-  if(!flag){
-    printf("It is a boardcast address! need to send reply!\n");
-    sr_arpcache_queuereq(&sr->cache, iphdr->ip_src, packet, len, interface);
-  } else {
-    printf("It is a message reply to me!\n");
-  }*/
 }
 
 void handle_ip(struct sr_instance *sr,
@@ -160,5 +149,13 @@ void handle_ip(struct sr_instance *sr,
 
 void longest_prefix_match(struct in_addr des){
   printf("%s\t\t\n",inet_ntoa(des));
+}
+
+sr_arp_hdr_t *get_arp_header(uint8_t *packet) {
+  return (sr_arp_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t));
+}
+
+sr_ethernet_hdr_t *get_Ethernet_header(uint8_t *packet){
+  return (sr_ethernet_hdr_t *)packet;
 }
 
