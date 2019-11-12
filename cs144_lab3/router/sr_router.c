@@ -141,9 +141,23 @@ void handle_arp(struct sr_instance *sr,
       free(arp_reply);
     }
 
-  } else {
+  } else if (arp_op_reply == ntohs(arp_header->ar_op)) { /* if it is a arp reply */
     printf("It is a arp reply!\n");
+    struct sr_arpreq *cached_arp_req = sr_arpcache_insert(&(sr->cache),arp_header->ar_sha,arp_header->ar_sip);
 
+    if (cached_arp_req) {
+
+        struct sr_packet *arp_reply_packet = cached_arp_req->packets;
+        while (arp_reply_packet) { /* Send ARP reply for original ARP request*/
+            uint8_t *send_packet = arp_reply_packet->buf;
+            sr_ethernet_hdr_t *send_ethernet_header = get_Ethernet_header(send_packet);
+            memcpy(send_ethernet_header->ether_dhost, arp_header->ar_sha, ETHER_ADDR_LEN);
+            memcpy(send_ethernet_header->ether_shost, packet_interface->addr, ETHER_ADDR_LEN);
+            sr_send_packet(sr, send_packet, arp_reply_packet->len, interface);
+            arp_reply_packet = arp_reply_packet->next;
+        }
+        sr_arpreq_destroy(&(sr->cache), cached_arp_req);
+    }
 
   }
 }
