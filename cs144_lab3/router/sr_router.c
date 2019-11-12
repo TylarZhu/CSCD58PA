@@ -119,13 +119,14 @@ void handle_arp(struct sr_instance *sr,
       /* constract a arp reply */
       uint8_t *arp_reply = (uint8_t *) malloc(len);
       memset(arp_reply, 0, len * sizeof(uint8_t));
-      sr_ethernet_hdr_t *reply_ethernet_header = (sr_ethernet_hdr_t *) arp_reply;
-      sr_arp_hdr_t *reply_arp_header = (sr_arp_hdr_t *) arp_reply;
+      sr_ethernet_hdr_t *reply_ethernet_header = get_Ethernet_header(arp_reply);
+      sr_arp_hdr_t *reply_arp_header = get_arp_header(arp_reply);
 
       /* reply ethernet */
-      memcpy(reply_ethernet_header->ether_dhost, ethernet_header->ether_shost, ETHER_ADDR_LEN);
-      memcpy(reply_ethernet_header->ether_shost, packet_interface->addr, ETHER_ADDR_LEN);
-      reply_ethernet_header->ether_type = ntohl(ethertype_arp);
+
+      memcpy(reply_ethernet_header->ether_shost, packet_interface->addr, sizeof(uint8_t) * ETHER_ADDR_LEN);
+      memcpy(reply_ethernet_header->ether_dhost, ethernet_header->ether_shost, sizeof(uint8_t) * ETHER_ADDR_LEN);
+      reply_ethernet_header->ether_type = htons(ethertype_arp);
 
       /* reply arp */
       memcpy(reply_arp_header, arp_header, sizeof(sr_arp_hdr_t));
@@ -134,10 +135,6 @@ void handle_arp(struct sr_instance *sr,
       memcpy(reply_arp_header->ar_sha, packet_interface->addr, ETHER_ADDR_LEN);
       reply_arp_header->ar_sip = packet_interface->ip;
       reply_arp_header->ar_tip = arp_header->ar_sip;
-
-      fprintf(stderr, "++++++++++++++++\n");
-      print_addr_eth(ethernet_header->ether_shost);
-      sr_print_if(packet_interface);
       
       /* send the packet back */
       sr_send_packet(sr, arp_reply, len, interface);
@@ -146,6 +143,8 @@ void handle_arp(struct sr_instance *sr,
 
   } else {
     printf("It is a arp reply!\n");
+
+
   }
 }
 
