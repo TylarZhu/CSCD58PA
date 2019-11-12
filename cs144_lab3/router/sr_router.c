@@ -84,10 +84,10 @@ void sr_handlepacket(struct sr_instance* sr,
   /* if the packet is ARP, 
   then we look at the destination to figure out it is a request or reply.*/
   if(type == 2054){
-    printf("It is ARP! \n");
+    fprintf(stderr, "It is ARP! \n");
     handle_arp(sr, packet, len, interface);
   } else {
-    printf("It is IP! \n");
+    fprintf(stderr, "It is IP! \n");
     handle_ip(sr, packet, len, interface);
   }
 }/* end sr_ForwardPacket */
@@ -102,7 +102,7 @@ void handle_arp(struct sr_instance *sr,
 
   /* if it is a arp request */
   if (ntohs(arp_header->ar_op) == arp_op_request) {
-    printf("It is a arp request!\n");
+    fprintf(stderr, "It is a arp request!\n");
 
     /* check if the target IP address is one of your router's IP address */
     if(arp_header->ar_tip == packet_interface->ip) {
@@ -139,10 +139,12 @@ void handle_arp(struct sr_instance *sr,
       /* send the packet back */
       sr_send_packet(sr, arp_reply, len, interface);
       free(arp_reply);
+    } else {
+
     }
 
   } else {
-    printf("It is a arp reply!\n");
+    fprintf(stderr, "It is a arp reply!\n");
 
 
   }
@@ -156,7 +158,6 @@ void handle_ip(struct sr_instance *sr,
 }
 
 void longest_prefix_match(struct in_addr des){
-  printf("%s\t\t\n",inet_ntoa(des));
 }
 
 sr_arp_hdr_t *get_arp_header(uint8_t *packet) {
