@@ -42,7 +42,7 @@ void arp_req_helper(struct sr_instance *sr, struct sr_arpreq *request)
                     coming_packet = coming_packet->next;
                     continue;
                 }
-                send__icmp_packet(sr, coming_packet->buf, coming_packet->len, out_if->name, 3, 1, NULL); //defined in sr_router.c
+                send__icmp_packet(sr, coming_packet->buf, coming_packet->len, out_if->name, 3, 1, NULL);
                 coming_packet = coming_packet->next;
             }
             sr_arpreq_destroy(&(sr->cache), request);
@@ -59,12 +59,12 @@ void arp_req_helper(struct sr_instance *sr, struct sr_arpreq *request)
 
             /* ethernet header */
             memcpy(out_eth_header->ether_shost, interface->addr, sizeof(uint8_t) * ETHER_ADDR_LEN);
-            memset(out_eth_header->ether_dhost, 0xff, sizeof(uint8_t) * ETHER_ADDR_LEN); //Broadcast
+            memset(out_eth_header->ether_dhost, 0xff, sizeof(uint8_t) * ETHER_ADDR_LEN);
             out_eth_header->ether_type = htons(ethertype_arp);
 
             /* ARP header*/
             out_arp_header->ar_op = htons(arp_op_request);
-            memset(out_arp_header->ar_tha, 0xff, ETHER_ADDR_LEN); //Broadcast
+            memset(out_arp_header->ar_tha, 0xff, ETHER_ADDR_LEN);
             memcpy(out_arp_header->ar_sha, interface->addr, ETHER_ADDR_LEN);
 
             out_arp_header->ar_pln = sizeof(uint32_t);
