@@ -100,13 +100,15 @@ void handle_arp(struct sr_instance *sr,
   sr_ethernet_hdr_t *ethernet_header = get_Ethernet_header(packet);
   struct sr_if *packet_interface = sr_get_interface(sr, interface);
 
+  print_hdr_arp(packet + sizeof(sr_ethernet_hdr_t));
+
   /* if it is a arp request */
   if (ntohs(arp_header->ar_op) == arp_op_request) {
     fprintf(stderr, "It is a arp request!\n");
 
     /* check if the target IP address is one of your router's IP address */
     if(arp_header->ar_tip == packet_interface->ip) {
-      fprintf(stderr, "\tsender hardware address: ");
+      /*fprintf(stderr, "\tsender hardware address: ");
       print_addr_eth(arp_header->ar_sha);
       fprintf(stderr, "\tsender ip address: ");
       print_addr_ip_int(ntohl(arp_header->ar_sip));
@@ -114,7 +116,9 @@ void handle_arp(struct sr_instance *sr,
       fprintf(stderr, "\ttarget hardware address: ");
       print_addr_eth(arp_header->ar_tha);
       fprintf(stderr, "\ttarget ip address: ");
-      print_addr_ip_int(ntohl(arp_header->ar_tip));
+      print_addr_ip_int(ntohl(arp_header->ar_tip));*/
+
+
 
       /* constract a arp reply */
       uint8_t *arp_reply = (uint8_t *) malloc(len);
@@ -136,34 +140,36 @@ void handle_arp(struct sr_instance *sr,
       reply_arp_header->ar_sip = packet_interface->ip;
       reply_arp_header->ar_tip = arp_header->ar_sip;
       
+      print_hdr_arp(arp_reply + sizeof(sr_ethernet_hdr_t));
+
       /* send the packet back */
       sr_send_packet(sr, arp_reply, len, interface);
       free(arp_reply);
-      
+    }
   } else if (arp_op_reply == ntohs(arp_header->ar_op)) { /* if it is a arp reply */
     printf("It is a arp reply!\n");
-    struct sr_arpreq *cached_arp_req = sr_arpcache_insert(&(sr->cache),arp_header->ar_sha,arp_header->ar_sip);
+    struct sr_arpreq *cached_arp_req = sr_arpcache_insert(&(sr->cache), arp_header->ar_sha, arp_header->ar_sip);
 
     if (cached_arp_req) {
-
-        struct sr_packet *arp_reply_packet = cached_arp_req->packets;
-        while (arp_reply_packet) { /* Send ARP reply for original ARP request*/
-            uint8_t *send_packet = arp_reply_packet->buf;
-            sr_ethernet_hdr_t *send_ethernet_header = get_Ethernet_header(send_packet);
-            memcpy(send_ethernet_header->ether_dhost, arp_header->ar_sha, ETHER_ADDR_LEN);
-            memcpy(send_ethernet_header->ether_shost, packet_interface->addr, ETHER_ADDR_LEN);
-            sr_send_packet(sr, send_packet, arp_reply_packet->len, interface);
-            arp_reply_packet = arp_reply_packet->next;
-        }
-        sr_arpreq_destroy(&(sr->cache), cached_arp_req);
+      struct sr_packet *arp_reply_packet = cached_arp_req->packets;
+      while (arp_reply_packet) { /* Send ARP reply for original ARP request*/
+        uint8_t *send_packet = arp_reply_packet->buf;
+        sr_ethernet_hdr_t *send_ethernet_header = get_Ethernet_header(send_packet);
+        memcpy(send_ethernet_header->ether_dhost, arp_header->ar_sha, ETHER_ADDR_LEN);
+        memcpy(send_ethernet_header->ether_shost, packet_interface->addr, ETHER_ADDR_LEN);
+        sr_send_packet(sr, send_packet, arp_reply_packet->len, interface);
+        arp_reply_packet = arp_reply_packet->next;
+      }
+      sr_arpreq_destroy(&(sr->cache), cached_arp_req);
     }
+  }
 }
 
 void handle_ip(struct sr_instance *sr,
                       uint8_t *packet/* lent */,
                       unsigned int len,
                       char *interface/* lent */){
-
+  
 }
 
 void longest_prefix_match(struct in_addr des){
