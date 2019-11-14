@@ -85,6 +85,29 @@ void arp_req_helper(struct sr_instance *sr, struct sr_arpreq *request)
 
 }
 
+struct sr_if *get_interface_from_eth(struct sr_instance *sr, uint8_t *eth_address)
+{
+    struct sr_if *curr_interface = sr->if_list;
+    struct sr_if *dest_interface = NULL;
+    short match_found, i;
+    while (curr_interface) {
+        match_found = 1;
+        for (i = 0; i < ETHER_ADDR_LEN; i++) {
+            if (curr_interface->addr[i] != eth_address[i]) {
+                match_found = 0;
+                break;
+            }
+        }
+        if (match_found) {
+            fprintf(stderr, "get_interface_from_eth found a matching interface.\n");
+            dest_interface = curr_interface;
+            break;
+        }
+        curr_interface = curr_interface->next;
+    }
+    return dest_interface;
+}
+
 /* You should not need to touch the rest of this code. */
 
 /* Checks if an IP->MAC mapping is in the cache. IP is in network byte order.

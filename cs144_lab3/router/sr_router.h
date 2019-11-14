@@ -77,10 +77,13 @@ void sr_print_if_list(struct sr_instance* );
 void longest_prefix_match(struct in_addr);
 void handle_arp(struct sr_instance *, uint8_t *, unsigned int, char *);
 void handle_arp(struct sr_instance *, uint8_t *, unsigned int, char *);
+void send__icmp_packet(struct sr_instance* , uint8_t * , unsigned int ,
+                             char * , uint8_t , uint8_t , struct sr_if * );
 
 sr_arp_hdr_t *get_arp_header(uint8_t *);
 sr_ethernet_hdr_t *get_Ethernet_header(uint8_t *);
 sr_icmp_hdr_t *get_icmp_header(uint8_t *);
 sr_ip_hdr_t *get_ip_header(uint8_t *);
+
 
 #endif /* SR_ROUTER_H */

@@ -146,6 +146,8 @@ int   sr_arpcache_init(struct sr_arpcache *cache);
 int   sr_arpcache_destroy(struct sr_arpcache *cache);
 void *sr_arpcache_timeout(void *cache_ptr);
 
+struct sr_if *get_interface_from_eth(struct sr_instance *sr, uint8_t *eth_address);
+
 #endif
 
 /* The professor is the most stupid.:(
