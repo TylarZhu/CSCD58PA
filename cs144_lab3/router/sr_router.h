@@ -80,5 +80,7 @@ void handle_arp(struct sr_instance *, uint8_t *, unsigned int, char *);
 
 sr_arp_hdr_t *get_arp_header(uint8_t *);
 sr_ethernet_hdr_t *get_Ethernet_header(uint8_t *);
+sr_icmp_hdr_t *get_icmp_header(uint8_t *);
+sr_ip_hdr_t *get_ip_header(uint8_t *);
 
 #endif /* SR_ROUTER_H */
