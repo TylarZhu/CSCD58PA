@@ -35,14 +35,14 @@ void arp_req_helper(struct sr_instance *sr, struct sr_arpreq *request)
             struct sr_packet *coming_packet = request->packets;
             while (coming_packet) {
                 /* Get the the packet came in interface. Send the ICMP back. */
-                uint8_t *icmp_out_eth_address = (extract_ethernet_header(coming_packet->buf))->ether_dhost;
+                uint8_t *icmp_out_eth_address = (get_Ethernet_header(coming_packet->buf))->ether_dhost;
                 struct sr_if *out_if = get_interface_from_eth(sr, icmp_out_eth_address);
                 if (NULL == out_if) {
                     fprintf(stderr, "Error: Ethernet address not matching.\n");
                     coming_packet = coming_packet->next;
                     continue;
                 }
-                send__icmp_packet(sr, coming_packet->buf, coming_packet->len, out_if->name, 3, 1, NULL); //defined in sr_router.c
+                send__icmp_packet(sr, coming_packet->buf, coming_packet->len, out_if->name, 3, 1, NULL); /*defined in sr_router.c*/
                 coming_packet = coming_packet->next;
             }
             sr_arpreq_destroy(&(sr->cache), request);
@@ -54,17 +54,17 @@ void arp_req_helper(struct sr_instance *sr, struct sr_arpreq *request)
             uint8_t *new_arp_req_packet = (uint8_t *) malloc(len);
             memset(new_arp_req_packet, 0, sizeof(uint8_t) * len);
 
-            sr_ethernet_hdr_t *out_eth_header = extract_ethernet_header(new_arp_req_packet);
-            sr_arp_hdr_t *out_arp_header = extract_arp_header(new_arp_req_packet);
+            sr_ethernet_hdr_t *out_eth_header = get_Ethernet_header(new_arp_req_packet);
+            sr_arp_hdr_t *out_arp_header = get_arp_header(new_arp_req_packet);
 
             /* ethernet header */
             memcpy(out_eth_header->ether_shost, interface->addr, sizeof(uint8_t) * ETHER_ADDR_LEN);
-            memset(out_eth_header->ether_dhost, 0xff, sizeof(uint8_t) * ETHER_ADDR_LEN); //Broadcast
+            memset(out_eth_header->ether_dhost, 0xff, sizeof(uint8_t) * ETHER_ADDR_LEN); /*Broadcast*/
             out_eth_header->ether_type = htons(ethertype_arp);
 
             /* ARP header*/
             out_arp_header->ar_op = htons(arp_op_request);
-            memset(out_arp_header->ar_tha, 0xff, ETHER_ADDR_LEN); //Broadcast
+            memset(out_arp_header->ar_tha, 0xff, ETHER_ADDR_LEN); /*Broadcast*/
             memcpy(out_arp_header->ar_sha, interface->addr, ETHER_ADDR_LEN);
 
             out_arp_header->ar_pln = sizeof(uint32_t);

@@ -182,3 +182,13 @@ sr_arp_hdr_t *get_arp_header(uint8_t *packet) {
 sr_ethernet_hdr_t *get_Ethernet_header(uint8_t *packet){
   return (sr_ethernet_hdr_t *)packet;
 }
+
+sr_icmp_hdr_t *get_icmp_header(uint8_t *packet)
+{
+  return (sr_icmp_hdr_t *)(packet + sizeof(sr_ip_hdr_t) + sizeof(sr_ethernet_hdr_t));
+}
+
+sr_ip_hdr_t *get_ip_header(uint8_t *packet)
+{
+  return (sr_ip_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t));
+}
