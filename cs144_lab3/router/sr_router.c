@@ -134,13 +134,14 @@ void handle_arp(struct sr_instance *sr,
 
       /* reply arp */
       memcpy(reply_arp_header, arp_header, sizeof(sr_arp_hdr_t));
-      reply_arp_header->ar_op = ntohl(arp_op_reply);
+      reply_arp_header->ar_op = htons(arp_op_reply);
       memcpy(reply_arp_header->ar_tha, arp_header->ar_sha, ETHER_ADDR_LEN);
       memcpy(reply_arp_header->ar_sha, packet_interface->addr, ETHER_ADDR_LEN);
       reply_arp_header->ar_sip = packet_interface->ip;
       reply_arp_header->ar_tip = arp_header->ar_sip;
       
       print_hdr_arp(arp_reply + sizeof(sr_ethernet_hdr_t));
+      print_hdr_eth((sr_ethernet_hdr_t *)arp_reply);
 
       /* send the packet back */
       sr_send_packet(sr, arp_reply, len, interface);
@@ -165,6 +166,7 @@ void handle_arp(struct sr_instance *sr,
   }
 }
 
+/*** need to change ***/
 void send__icmp_packet(struct sr_instance *sr, uint8_t *packet, unsigned int len,
                              char *receiving_interface, uint8_t icmp_type, uint8_t icmp_code, struct sr_if *destination_interface)
 {
@@ -178,11 +180,11 @@ void send__icmp_packet(struct sr_instance *sr, uint8_t *packet, unsigned int len
     uint8_t *send_icmp_packet = (uint8_t *)malloc(outgoing_len);
     memset(send_icmp_packet, 0, sizeof(uint8_t) * outgoing_len);
 
-    sr_ethernet_hdr_t *original_ethernet_header = extract_ethernet_header(packet);
-    sr_ip_hdr_t *original_ip_header = extract_ip_header(packet);
-    sr_icmp_hdr_t *send_icmp_header = extract_icmp_header(send_icmp_packet);
-    sr_ip_hdr_t *send_ip_header = extract_ip_header(send_icmp_packet);
-    sr_ethernet_hdr_t *send_ethernet_header = extract_ethernet_header(send_icmp_packet);
+    sr_ethernet_hdr_t *original_ethernet_header = get_Ethernet_header(packet);
+    sr_ip_hdr_t *original_ip_header = get_ip_header(packet);
+    sr_icmp_hdr_t *send_icmp_header = get_icmp_header(send_icmp_packet);
+    sr_ip_hdr_t *send_ip_header = get_ip_header(send_icmp_packet);
+    sr_ethernet_hdr_t *send_ethernet_header = get_Ethernet_header(send_icmp_packet);
 
     struct sr_if *outgoing_interface = sr_get_interface(sr, receiving_interface);
     uint32_t source_ip = outgoing_interface->ip;
@@ -194,10 +196,10 @@ void send__icmp_packet(struct sr_instance *sr, uint8_t *packet, unsigned int len
     if (0x00 == icmp_type) {
         /* Copying ICMP metadata into new ICMP header for type 0 */
         fprintf(stderr, "Outgoing ICMP is type 0. Copying original ICMP header into outgoing ICMP header\n");
-        memcpy(send_icmp_header, extract_icmp_header(packet), outgoing_len - sizeof(sr_ethernet_hdr_t) - sizeof(sr_ip_hdr_t));
+        memcpy(send_icmp_header, get_icmp_header(packet), outgoing_len - sizeof(sr_ethernet_hdr_t) - sizeof(sr_ip_hdr_t));
     } else {
         /*Copying 28 bytes of IP Header into icmp header for type 11 or type 3*/
-        memcpy(send_icmp_header->data, original_ip_header, ICMP_DATA_SIZE);
+        memcpy(send_icmp_header, original_ip_header, ICMP_DATA_SIZE);
     }
     send_icmp_header->icmp_code = icmp_code;
     send_icmp_header->icmp_type = icmp_type;
