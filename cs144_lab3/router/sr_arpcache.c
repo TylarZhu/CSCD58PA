@@ -85,6 +85,7 @@ void arp_req_helper(struct sr_instance *sr, struct sr_arpreq *request)
 
 }
 
+/*** need to change ***/
 struct sr_if *get_interface_from_eth(struct sr_instance *sr, uint8_t *eth_address)
 {
     struct sr_if *curr_interface = sr->if_list;
