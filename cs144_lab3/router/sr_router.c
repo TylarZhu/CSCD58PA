@@ -140,8 +140,8 @@ void handle_arp(struct sr_instance *sr,
       reply_arp_header->ar_sip = packet_interface->ip;
       reply_arp_header->ar_tip = arp_header->ar_sip;
       
-      print_hdr_arp(arp_reply + sizeof(sr_ethernet_hdr_t));
-      print_hdr_eth((sr_ethernet_hdr_t *)arp_reply);
+      /*print_hdr_arp(arp_reply + sizeof(sr_ethernet_hdr_t));
+      print_hdr_eth((sr_ethernet_hdr_t *)arp_reply);*/
 
       /* send the packet back */
       sr_send_packet(sr, arp_reply, len, interface);
@@ -164,6 +164,18 @@ void handle_arp(struct sr_instance *sr,
       sr_arpreq_destroy(&(sr->cache), cached_arp_req);
     }
   }
+}
+
+void handle_ip(struct sr_instance *sr,
+                      uint8_t *packet/* lent */,
+                      unsigned int len,
+                      char *interface/* lent */){
+  sr_ip_hdr_t *ip_header = get_ip_header(packet);
+  print_addr_ip_int(ip_header->ip_src);
+  print_addr_ip_int(ip_header->ip_dst);
+  sr_icmp_hdr_t *icmp_header = get_icmp_header(packet);
+  
+
 }
 
 /*** need to change ***/
@@ -227,13 +239,6 @@ void send__icmp_packet(struct sr_instance *sr, uint8_t *packet, unsigned int len
     return;
 }
 
-
-void handle_ip(struct sr_instance *sr,
-                      uint8_t *packet/* lent */,
-                      unsigned int len,
-                      char *interface/* lent */){
-  
-}
 
 void longest_prefix_match(struct in_addr des){
 }
