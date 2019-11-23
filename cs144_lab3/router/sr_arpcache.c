@@ -85,28 +85,25 @@ void arp_req_helper(struct sr_instance *sr, struct sr_arpreq *request)
 
 }
 
-/*** need to change ***/
+/** changed**/
 struct sr_if *get_interface_from_eth(struct sr_instance *sr, uint8_t *eth_address)
 {
     struct sr_if *curr_interface = sr->if_list;
-    struct sr_if *dest_interface = NULL;
-    short match_found, i;
+    int check, i;
     while (curr_interface) {
-        match_found = 1;
+        check = 1;
         for (i = 0; i < ETHER_ADDR_LEN; i++) {
             if (curr_interface->addr[i] != eth_address[i]) {
-                match_found = 0;
-                break;
+                check = 0;
+                i = ETHER_ADDR_LEN;
             }
         }
-        if (match_found) {
-            fprintf(stderr, "get_interface_from_eth found a matching interface.\n");
-            dest_interface = curr_interface;
-            break;
+        if (check) {
+            return curr_interface;
         }
         curr_interface = curr_interface->next;
     }
-    return dest_interface;
+    return NULL;
 }
 
 /* You should not need to touch the rest of this code. */
