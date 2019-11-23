@@ -229,9 +229,6 @@ void send_icmp_packet(struct sr_instance *sr, uint8_t *packet, unsigned int data
 }
 
 
-<<<<<<< HEAD
-void longest_prefix_match(struct in_addr des){
-=======
 void handle_ip(struct sr_instance *sr,
                       uint8_t *packet/* lent */,
                       unsigned int len,
@@ -340,7 +337,6 @@ struct sr_rt *longest_prefix_match(struct sr_instance *sr, uint32_t dest_ip){
         rtable = rtable->next;
     }
     return longest_prefix;
->>>>>>> 0f570826380d50bd138448345e8c976349c71f9e
 }
 
 sr_arp_hdr_t *get_arp_header(uint8_t *packet) {
