@@ -245,7 +245,7 @@ void handle_ip(struct sr_instance *sr,
     uint16_t orig_sum = orig_ip_header->ip_sum;
     orig_ip_header->ip_sum = 0;
     orig_ip_header->ip_sum = cksum(orig_ip_header, sizeof(sr_ip_hdr_t));
-    uint16_t calculated_sum = orig_ip_header->ip_sum
+    uint16_t calculated_sum = orig_ip_header->ip_sum;
     if (calculated_sum != orig_sum) {
         orig_ip_header->ip_sum = orig_sum;
         return 1;
@@ -268,7 +268,7 @@ void handle_ip(struct sr_instance *sr,
             orig_icmp_header->icmp_sum = 0;
             orig_icmp_header->icmp_sum = cksum(orig_icmp_header, len - sizeof(sr_ethernet_hdr_t) - sizeof(sr_ip_hdr_t));
 
-            calculated_sum = orig_icmp_header->icmp_sum
+            calculated_sum = orig_icmp_header->icmp_sum;
             if (calculated_sum != orig_sum) {
                 orig_icmp_header->icmp_sum = orig_sum;
                 return 1;

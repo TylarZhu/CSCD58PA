@@ -74,7 +74,6 @@ void sr_set_ether_ip(struct sr_instance* , uint32_t );
 void sr_set_ether_addr(struct sr_instance* , const unsigned char* );
 void sr_print_if_list(struct sr_instance* );
 
-void longest_prefix_match(struct in_addr);
 void handle_arp(struct sr_instance *, uint8_t *, unsigned int, char *);
 void handle_arp(struct sr_instance *, uint8_t *, unsigned int, char *);
 void send__icmp_packet(struct sr_instance* , uint8_t * , unsigned int ,
@@ -84,6 +83,8 @@ sr_arp_hdr_t *get_arp_header(uint8_t *);
 sr_ethernet_hdr_t *get_Ethernet_header(uint8_t *);
 sr_icmp_hdr_t *get_icmp_header(uint8_t *);
 sr_ip_hdr_t *get_ip_header(uint8_t *);
+struct sr_if *get_interface_from_ip(struct sr_instance *sr, uint32_t ip_address);
+struct sr_rt *longest_prefix_match(struct sr_instance *sr, uint32_t dest_ip);
 
 
 #endif /* SR_ROUTER_H */

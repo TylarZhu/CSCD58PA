@@ -42,7 +42,7 @@ void arp_req_helper(struct sr_instance *sr, struct sr_arpreq *request)
                     coming_packet = coming_packet->next;
                     continue;
                 }
-                send__icmp_packet(sr, coming_packet->buf, coming_packet->len, out_if->name, 3, 1, NULL); /*defined in sr_router.c*/
+                send_icmp_packet(sr, coming_packet->buf, coming_packet->len, out_if->name, 3, 1, NULL); /*defined in sr_router.c*/
                 coming_packet = coming_packet->next;
             }
             sr_arpreq_destroy(&(sr->cache), request);
